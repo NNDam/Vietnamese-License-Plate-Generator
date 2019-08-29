@@ -1,0 +1,4 @@
+numpy
+opencv-python==3.4.1.15
+pillow
+progressbar2
