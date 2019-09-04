@@ -1,5 +1,5 @@
-# Vietnamese-Synthesis-License-Plate
-Vietnamese Synthesis License Plate for OCR part
+# Vietnamese-License-Plate-Generator
+Vietnamese License Plate Generator for OCR part
 
 # Example
 
