@@ -1,4 +1,4 @@
 numpy
-opencv-python==3.4.1.15
+opencv-python==3.4.7.28
 pillow
 progressbar2
