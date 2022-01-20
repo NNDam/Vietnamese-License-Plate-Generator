@@ -101,7 +101,7 @@ def generate_sample(template):
         idx_char = random.randint(0, total_char - 1)
         template = template.replace('C', available_char[idx_char], 1)
     for i in range(count_all):
-        idx_char = random.randint(0, total_char - 1)
+        idx_char = random.randint(0, total_char + total_number - 1)
         template = template.replace('*', available_all[idx_char], 1)
     return template
 
