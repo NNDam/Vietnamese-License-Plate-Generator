@@ -10,11 +10,13 @@ from generate_image import *
 from utils import *
 from aug import augmention
 
-available_number = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-available_char = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+available_number = [x.replace("\n", "") for x in open('classes_num.txt').readlines()]
+# available_number = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+available_char = [x.replace("\n", "") for x in open('classes_char.txt').readlines()]
+# available_char = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 available_all = available_number + available_char
-# available_template = ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN', 'NNC-NNNN', 'NNC-NNN.NN']
-available_template = ['**-**/****', '**-**/***.**', '***/***.**', '***/****', '***-****', '***-***.**']
+available_template = ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN', 'NNC-NNNN', 'NNC-NNN.NN']
+# available_template = ['**-**/****', '**-**/***.**', '***/***.**', '***/****', '***-****', '***-***.**']
 available_square_bg = glob.glob('background/square*.jpg')
 available_rec_bg = glob.glob('background/rec*.jpg')
 
@@ -38,25 +40,25 @@ def generate_boundingbox(sample, template, background, textsize, size = (480, 40
 		return generate_1line_boundingbox(sample, template, background, textsize)
 
 def sort_boxes(boxes, max_distance=0.3):
-    total_numb = len(boxes)
+	total_numb = len(boxes)
 
-    line_1 = []
-    sorted_line_1 = []
-    line_2 = []
-    sorted_line_2 = []
+	line_1 = []
+	sorted_line_1 = []
+	line_2 = []
+	sorted_line_2 = []
 
-    min_y = np.min(boxes[:, 1])
+	min_y = np.min(boxes[:, 1])
 
-    for i in range(total_numb):
-        if math.fabs(boxes[i][1]-min_y) < max_distance:
-            line_1.append(boxes[i])
-        else:
-            line_2.append(boxes[i])
+	for i in range(total_numb):
+		if math.fabs(boxes[i][1]-min_y) < max_distance:
+			line_1.append(boxes[i])
+		else:
+			line_2.append(boxes[i])
 
-    sorted_line_1 = [x for x in sorted(line_1, key = lambda line_1: line_1[0])]
-    if len(line_2) > 0:
-    	sorted_line_2 = [x for x in sorted(line_2, key = lambda line_2: line_2[0])]
-    return sorted_line_1 + sorted_line_2
+	sorted_line_1 = [x for x in sorted(line_1, key = lambda line_1: line_1[0])]
+	if len(line_2) > 0:
+		sorted_line_2 = [x for x in sorted(line_2, key = lambda line_2: line_2[0])]
+	return sorted_line_1 + sorted_line_2
 
 def segment_and_get_boxes(img, sample, textsize, margin = 3):
     total_char = len(sample.replace('.', '').replace('/', '').replace('-', ''))
@@ -74,7 +76,7 @@ def segment_and_get_boxes(img, sample, textsize, margin = 3):
     thresh[:int(height*0.05), :] = 0
     thresh[int(height*0.95):, :] = 0
     # cv2.imshow('thresh', thresh)
-    _, contours, hier = cv2.findContours(thresh.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    contours, hier = cv2.findContours(thresh.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     sorted_contours = sorted(contours, key = cv2.contourArea, reverse = True)
     list_box = []
     for i in range(len(sorted_contours)):
@@ -108,10 +110,10 @@ def generate_sample(template):
 def generate_plate(template):
 	if '/' in template:
 		bg = available_square_bg[random.randint(0, len(available_square_bg) - 1)]
-		return generate_2lines_images(template, bg)
+		return generate_2lines_image(template, bg)
 	else:
 		bg = available_rec_bg[random.randint(0, len(available_rec_bg) - 1)]
-		return generate_1lines_image(template, bg)
+		return generate_1line_image(template, bg)
 
 def generate_yolo_label(boxes, sample_formated, filename):
 	#print(sample_formated)
@@ -124,6 +126,7 @@ def generate_yolo_label(boxes, sample_formated, filename):
 		for i in range(len(boxes)):
 			x, y, w, h = boxes[i]
 			f.write('{} {} {} {} {}\n'.format(box_label[sample_formated[i]], x, y, w, h))
+
 
 def visualize(img, boxes, label):
 	height, width, _ = img.shape
@@ -163,7 +166,7 @@ if __name__ == '__main__':
 			width, height = base_img.size
 			boxes = segment_and_get_boxes(np.array(base_img), sample, textsize)
 			labels = sample.replace('-', '').replace('.', '').replace('/', '')
-			generate_yolo_label(boxes, labels, filename)
+			#generate_yolo_label(boxes, labels, filename)
 			base_img.save(filename)
 			if visual:
 				visualize(np.array(base_img), boxes, labels)
