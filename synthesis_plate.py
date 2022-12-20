@@ -15,7 +15,14 @@ available_number = [x.replace("\n", "") for x in open('classes_num.txt').readlin
 available_char = [x.replace("\n", "") for x in open('classes_char.txt').readlines()]
 # available_char = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 available_all = available_number + available_char
-available_template = ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN', 'NNC-NNNN', 'NNC-NNN.NN']
+available_template = {
+	'all': ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN', 'NNC-NNNN', 'NNC-NNN.NN'],
+	'rectangle': ['NNC-NNNN', 'NNC-NNN.NN'],
+	'square': ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN']
+}
+
+available_template = ['NNC-NNNN', 'NNC-NNN.NN']
+# available_template = ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN', 'NNC-NNNN', 'NNC-NNN.NN']
 # available_template = ['**-**/****', '**-**/***.**', '***/***.**', '***/****', '***-****', '***-***.**']
 available_square_bg = glob.glob('background/square*.jpg')
 available_rec_bg = glob.glob('background/rec*.jpg')
@@ -33,11 +40,11 @@ for i in range(len(data)):
 
 assert os.path.exists('classes.txt') == True, 'Not exists file classes.txt, try again !'
 
-def generate_boundingbox(sample, template, background, textsize, size = (480, 400), margin = 10):
-	if '/' in template:
-		return generate_2lines_boundingbox(sample, template, background, textsize)
-	else:
-		return generate_1line_boundingbox(sample, template, background, textsize)
+# def generate_boundingbox(sample, template, background, textsize, size = (480, 400), margin = 10):
+# 	if '/' in template:
+# 		return generate_2lines_boundingbox(sample, template, background, textsize)
+# 	else:
+# 		return generate_1line_boundingbox(sample, template, background, textsize)
 
 def sort_boxes(boxes, max_distance=0.3):
 	total_numb = len(boxes)
@@ -127,6 +134,12 @@ def generate_yolo_label(boxes, sample_formated, filename):
 			x, y, w, h = boxes[i]
 			f.write('{} {} {} {} {}\n'.format(box_label[sample_formated[i]], x, y, w, h))
 
+def generate_lprnet_label(boxes, sample_formated, filename):
+	assert len(boxes) == len(sample_formated)
+	filename_txt = filename.split('.')[0] + '.txt'
+	open(filename_txt, 'w+')
+	pass
+
 
 def visualize(img, boxes, label):
 	height, width, _ = img.shape
@@ -150,23 +163,30 @@ if __name__ == '__main__':
 
 	parser.add_argument('--output_dir', default='output',
 	                   help='Output directory')
+	
+	parser.add_argument('--shape', default='all',
+	                   help='rectangle or square or all')
+
 
 	args = parser.parse_args()
 	if not os.path.exists(args.output_dir):
 		os.mkdir(args.output_dir)
+
+	
 	err = 0
 	for i in progressbar.progressbar(range(int(args.numb))):
 		try:
-			filename = os.path.join(args.output_dir ,'syn_{}.jpg'.format(i))
+			
 			idx = random.randint(0, total_template - 1)
-			template = available_template[idx]
+			template = available_template[args.shape][idx]
 			sample = generate_sample(template)
 			base_img, textsize = generate_plate(sample)
 			# aug_img = augmention(base_img)
 			width, height = base_img.size
 			boxes = segment_and_get_boxes(np.array(base_img), sample, textsize)
 			labels = sample.replace('-', '').replace('.', '').replace('/', '')
-			#generate_yolo_label(boxes, labels, filename)
+			filename = os.path.join(args.output_dir,'{}.jpg'.format(sample.replace('.', '').replace('-', '')))
+			# generate_yolo_label(boxes, labels, filename)
 			base_img.save(filename)
 			if visual:
 				visualize(np.array(base_img), boxes, labels)
