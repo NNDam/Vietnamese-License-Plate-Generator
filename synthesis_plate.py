@@ -18,16 +18,18 @@ available_all = available_number + available_char
 available_template = {
 	'all': ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN', 'NNC-NNNN', 'NNC-NNN.NN'],
 	'rectangle': ['NNC-NNNN', 'NNC-NNN.NN'],
-	'square': ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN']
+	'square': ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN'],
+	'square_line_1': ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN'],
+	'square_line_2': ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN']
 }
 
-available_template = ['NNC-NNNN', 'NNC-NNN.NN']
+# available_template = ['NNC-NNNN', 'NNC-NNN.NN']
 # available_template = ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN', 'NNC-NNNN', 'NNC-NNN.NN']
 # available_template = ['**-**/****', '**-**/***.**', '***/***.**', '***/****', '***-****', '***-***.**']
 available_square_bg = glob.glob('background/square*.jpg')
 available_rec_bg = glob.glob('background/rec*.jpg')
 
-total_template = len(available_template)
+
 total_number = len(available_number)
 total_char = len(available_char)
 
@@ -165,13 +167,14 @@ if __name__ == '__main__':
 	                   help='Output directory')
 	
 	parser.add_argument('--shape', default='all',
-	                   help='rectangle or square or all')
+	                   help='rectangle or square or square_line_1 or square_line_2 or all')
 
 
 	args = parser.parse_args()
 	if not os.path.exists(args.output_dir):
 		os.mkdir(args.output_dir)
 
+	total_template = len(available_template[args.shape])
 	
 	err = 0
 	for i in progressbar.progressbar(range(int(args.numb))):
@@ -184,8 +187,14 @@ if __name__ == '__main__':
 			# aug_img = augmention(base_img)
 			width, height = base_img.size
 			boxes = segment_and_get_boxes(np.array(base_img), sample, textsize)
-			labels = sample.replace('-', '').replace('.', '').replace('/', '')
-			filename = os.path.join(args.output_dir,'{}.jpg'.format(sample.replace('.', '').replace('-', '')))
+			
+			if args.shape in ['all', 'rectangle', 'square']:
+				labels = sample.replace('-', '').replace('.', '').replace('/', '')
+			elif args.shape in ['square_line_1']:
+				labels = sample.replace('-', '').replace('.', '').split("/")[0]
+			elif args.shape in ['square_line_2']:
+				labels = sample.replace('-', '').replace('.', '').split("/")[1]
+			filename = os.path.join(args.output_dir,'{}.jpg'.format(labels))
 			# generate_yolo_label(boxes, labels, filename)
 			base_img.save(filename)
 			if visual:

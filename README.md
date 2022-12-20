@@ -28,8 +28,10 @@ pip install -r requirements.txt
 python synthesis_plate.py --numb 1000 --output_dir output
 # generate rectangle
 python synthesis_plate.py --numb 1000 --output_dir output --shape rectangle
-# generate square
-python synthesis_plate.py --numb 1000 --output_dir output --shape square
+# generate square with label line 1
+python synthesis_plate.py --numb 1000 --output_dir output --shape square_line_1
+# generate square with label line 2
+python synthesis_plate.py --numb 1000 --output_dir output --shape square_line_2
 ```
 # Modify config
 * Available characters, numbers, template in top of **synthesis_plate.py** file 
