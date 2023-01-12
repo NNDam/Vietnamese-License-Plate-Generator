@@ -19,8 +19,6 @@ available_template = {
 	'all': ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN', 'NNC-NNNN', 'NNC-NNN.NN'],
 	'rectangle': ['NNC-NNNN', 'NNC-NNN.NN'],
 	'square': ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN'],
-	'square_line_1': ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN'],
-	'square_line_2': ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN']
 }
 
 # available_template = ['NNC-NNNN', 'NNC-NNN.NN']
@@ -187,18 +185,35 @@ if __name__ == '__main__':
 			# aug_img = augmention(base_img)
 			width, height = base_img.size
 			boxes = segment_and_get_boxes(np.array(base_img), sample, textsize)
-			
-			if args.shape in ['all', 'rectangle', 'square']:
-				labels = sample.replace('-', '').replace('.', '').replace('/', '')
-			elif args.shape in ['square_line_1']:
+			w, h = base_img.size
+
+			if args.shape in ['all']:
+				labels = sample.replace('-', '').replace('.', '').replace('/', '\n')
+				filename = os.path.join(args.output_dir,'{}_all_{:06d}.jpg'.format(args.shape, i))
+				with open(filename.replace(".jpg", ".txt"), mode = "w") as f:
+					f.write(labels)
+				base_img.save(filename)
+			elif args.shape in ['rectangle']:
+				labels = sample.replace('-', '').replace('.', '')
+				filename = os.path.join(args.output_dir,'{}_rec_{:06d}.jpg'.format(args.shape, i))
+				with open(filename.replace(".jpg", ".txt"), mode = "w") as f:
+					f.write(labels)
+				base_img.save(filename)
+			elif args.shape in ['square']:
 				labels = sample.replace('-', '').replace('.', '').split("/")[0]
-			elif args.shape in ['square_line_2']:
+				save_1 = base_img.crop((0, 0, w, h // 2))
+				filename = os.path.join(args.output_dir,'{}_top_{:06d}.jpg'.format(args.shape, i))
+				with open(filename.replace(".jpg", ".txt"), mode = "w") as f:
+					f.write(labels)
+				save_1.save(filename)
+
+
 				labels = sample.replace('-', '').replace('.', '').split("/")[1]
-			filename = os.path.join(args.output_dir,'{}.jpg'.format(labels))
-			# generate_yolo_label(boxes, labels, filename)
-			base_img.save(filename)
-			if visual:
-				visualize(np.array(base_img), boxes, labels)
+				save_2 = base_img.crop((0, h // 2, w, h))
+				filename = os.path.join(args.output_dir,'{}_bot_{:06d}.jpg'.format(args.shape, i))
+				with open(filename.replace(".jpg", ".txt"), mode = "w") as f:
+					f.write(labels)
+				save_2.save(filename)
 		except AssertionError:
 			err += 1
 	print('Completed !')

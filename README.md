@@ -25,13 +25,11 @@ Square type
 ``` bash
 pip install -r requirements.txt
 # generate random
-python synthesis_plate.py --numb 1000 --output_dir output
+python synthesis_plate.py --numb 1000 --output_dir output --shape all
 # generate rectangle
 python synthesis_plate.py --numb 1000 --output_dir output --shape rectangle
-# generate square with label line 1
-python synthesis_plate.py --numb 1000 --output_dir output --shape square_line_1
-# generate square with label line 2
-python synthesis_plate.py --numb 1000 --output_dir output --shape square_line_2
+# generate square
+python synthesis_plate.py --numb 1000 --output_dir output --shape square
 ```
 # Modify config
 * Available characters, numbers, template in top of **synthesis_plate.py** file 
