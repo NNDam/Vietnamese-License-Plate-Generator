@@ -2,13 +2,11 @@ import cv2
 import glob
 import os
 import random
-from PIL import ImageFont, ImageDraw, Image
 import numpy as np
-import progressbar
 import math
 from generate_image import *
 from utils import *
-from aug import augmention
+from tqdm import tqdm
 
 available_number = [x.replace("\n", "") for x in open('classes_num.txt').readlines()]
 # available_number = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -125,7 +123,7 @@ def generate_plate(template):
 def generate_yolo_label(boxes, sample_formated, filename):
 	#print(sample_formated)
 	assert len(boxes) == len(sample_formated)
-	filename_txt = filename.split('.')[0] + '.txt'
+	filename_txt = filename.replace(".jpg", ".txt")
 	# Delete current label file
 	open(filename_txt, 'w+')
 	# Write yolo label
@@ -160,6 +158,9 @@ if __name__ == '__main__':
 
 	parser.add_argument('--numb', default=1,
 	                   help='Total number of Synthesis images')
+	
+	parser.add_argument('--string_save', action="store_true",
+	                   help='save label as string')
 
 	parser.add_argument('--output_dir', default='output',
 	                   help='Output directory')
@@ -169,13 +170,16 @@ if __name__ == '__main__':
 
 
 	args = parser.parse_args()
-	if not os.path.exists(args.output_dir):
-		os.mkdir(args.output_dir)
+	os.makedirs(args.output_dir, exist_ok=True)
+	os.makedirs(os.path.join(args.output_dir, "images"), exist_ok=True)
+	os.makedirs(os.path.join(args.output_dir, "labels"), exist_ok=True)
 
 	total_template = len(available_template[args.shape])
 	
 	err = 0
-	for i in progressbar.progressbar(range(int(args.numb))):
+
+
+	for i in tqdm(range(int(args.numb))):
 		try:
 			
 			idx = random.randint(0, total_template - 1)
@@ -187,33 +191,43 @@ if __name__ == '__main__':
 			boxes = segment_and_get_boxes(np.array(base_img), sample, textsize)
 			w, h = base_img.size
 
-			if args.shape in ['all']:
-				labels = sample.replace('-', '').replace('.', '').replace('/', '\n')
-				filename = os.path.join(args.output_dir,'{}_all_{:06d}.jpg'.format(args.shape, i))
-				with open(filename.replace(".jpg", ".txt"), mode = "w") as f:
-					f.write(labels)
-				base_img.save(filename)
-			elif args.shape in ['rectangle']:
-				labels = sample.replace('-', '').replace('.', '')
-				filename = os.path.join(args.output_dir,'{}_rec_{:06d}.jpg'.format(args.shape, i))
-				with open(filename.replace(".jpg", ".txt"), mode = "w") as f:
-					f.write(labels)
-				base_img.save(filename)
-			elif args.shape in ['square']:
-				labels = sample.replace('-', '').replace('.', '').split("/")[0]
-				save_1 = base_img.crop((0, 0, w, h // 2))
-				filename = os.path.join(args.output_dir,'{}_top_{:06d}.jpg'.format(args.shape, i))
-				with open(filename.replace(".jpg", ".txt"), mode = "w") as f:
-					f.write(labels)
-				save_1.save(filename)
+			labels = sample.replace('-', '').replace('.', '').replace('/', '')
+			filename = os.path.join(args.output_dir, "images", 'synthesis_{:06d}.jpg'.format(i))
+			generate_yolo_label(boxes, labels, filename.replace("images", "labels"))
+			base_img.save(filename)
+
+			# if args.shape in ['all']:
+			# 	labels = sample.replace('-', '').replace('.', '').replace('/', '\n')
+			# 	filename = os.path.join(args.output_dir,'{}_all_{:06d}.jpg'.format(args.shape, i))
+				
+			# 	if args.string_save:
+			# 		with open(filename.replace(".jpg", ".txt"), mode = "w") as f:
+			# 			f.write(labels)
+			# 	else:
+			# 		generate_yolo_label(boxes, labels, filename)
+				
+			# 	base_img.save(filename)
+			# elif args.shape in ['rectangle']:
+			# 	labels = sample.replace('-', '').replace('.', '')
+			# 	filename = os.path.join(args.output_dir,'{}_rec_{:06d}.jpg'.format(args.shape, i))
+			# 	with open(filename.replace(".jpg", ".txt"), mode = "w") as f:
+			# 		f.write(labels)
+			# 	base_img.save(filename)
+			# elif args.shape in ['square']:
+			# 	labels = sample.replace('-', '').replace('.', '').split("/")[0]
+			# 	save_1 = base_img.crop((0, 0, w, h // 2))
+			# 	filename = os.path.join(args.output_dir,'{}_top_{:06d}.jpg'.format(args.shape, i))
+			# 	with open(filename.replace(".jpg", ".txt"), mode = "w") as f:
+			# 		f.write(labels)
+			# 	save_1.save(filename)
 
 
-				labels = sample.replace('-', '').replace('.', '').split("/")[1]
-				save_2 = base_img.crop((0, h // 2, w, h))
-				filename = os.path.join(args.output_dir,'{}_bot_{:06d}.jpg'.format(args.shape, i))
-				with open(filename.replace(".jpg", ".txt"), mode = "w") as f:
-					f.write(labels)
-				save_2.save(filename)
+			# 	labels = sample.replace('-', '').replace('.', '').split("/")[1]
+			# 	save_2 = base_img.crop((0, h // 2, w, h))
+			# 	filename = os.path.join(args.output_dir,'{}_bot_{:06d}.jpg'.format(args.shape, i))
+			# 	with open(filename.replace(".jpg", ".txt"), mode = "w") as f:
+			# 		f.write(labels)
+			# 	save_2.save(filename)
 		except AssertionError:
 			err += 1
 	print('Completed !')

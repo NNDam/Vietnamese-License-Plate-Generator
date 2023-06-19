@@ -1,4 +1,6 @@
 __pycache__/
 output/
+synthesis_train_10000/
+synthesis_valid_1000/
 
 *.zip
