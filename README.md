@@ -22,9 +22,12 @@ Square type
 </p>
 
 # Simple use
-```
+``` bash
 pip install -r requirements.txt
-python synthesis_plate.py --numb 1000 --output_dir output
+# generate random
+python synthesis_plate.py --numb 1000 --output_dir output --shape all
+# generate all char
+python synthesis_plate.py --numb 1000 --output_dir output --shape all-char
 ```
 # Modify config
 * Available characters, numbers, template in top of **synthesis_plate.py** file 

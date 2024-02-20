@@ -1,7 +1,7 @@
 from PIL import Image, ImageFont, ImageDraw
 import numpy as np 
 
-def generate_1lines_image(template, bg = 'background/bg1.jpg'):
+def generate_1line_image(template, bg = 'background/bg1.jpg'):
 	font = ImageFont.truetype("MyFont-Regular_ver3.otf", 108)
 	if type(bg).__name__ == 'str':
 		im = Image.open(bg)
@@ -20,7 +20,7 @@ def generate_1lines_image(template, bg = 'background/bg1.jpg'):
 	draw.text((textX, textY), template, font=font, fill=fill)
 	return im, textsize
 
-def generate_2lines_images(template, bg = 'background/bg2.jpg', margin = 10, size = (480, 400)):
+def generate_2lines_image(template, bg = 'background/bg2.jpg', margin = 10, size = (480, 400)):
 	font = ImageFont.truetype("MyFont-Regular_ver3.otf", 180)
 	if type(bg).__name__ == 'str':
 		im = Image.open(bg)
