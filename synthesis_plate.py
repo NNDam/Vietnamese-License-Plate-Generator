@@ -17,11 +17,13 @@ available_template = {
 	'all': ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN', 'NNC-NNNN', 'NNC-NNN.NN'],
 	'rectangle': ['NNC-NNNN', 'NNC-NNN.NN'],
 	'square': ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN'],
+	'all-char': ['CC-CC/CCCC', 'CC-CC/CCC.CC', 'CCC/CCC.CC', 'CCC/CCCC', 'CCC-CCCC', 'CCC-CCC.CC'],
 }
 
 # available_template = ['NNC-NNNN', 'NNC-NNN.NN']
 # available_template = ['NN-CN/NNNN', 'NN-CN/NNN.NN', 'NNC/NNN.NN', 'NNC/NNNN', 'NNC-NNNN', 'NNC-NNN.NN']
 # available_template = ['**-**/****', '**-**/***.**', '***/***.**', '***/****', '***-****', '***-***.**']
+# available_template = ['CC-CC/CCCC', 'CC-CC/CCC.CC', 'CCC/CCC.CC', 'CCC/CCCC', 'CCC-CCCC', 'CCC-CCC.CC']
 available_square_bg = glob.glob('background/square*.jpg')
 available_rec_bg = glob.glob('background/rec*.jpg')
 

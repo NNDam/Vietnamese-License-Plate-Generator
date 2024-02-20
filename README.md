@@ -25,7 +25,9 @@ Square type
 ``` bash
 pip install -r requirements.txt
 # generate random
-python synthesis_plate.py --numb 1000 --output_dir output 
+python synthesis_plate.py --numb 1000 --output_dir output --shape all
+# generate all char
+python synthesis_plate.py --numb 1000 --output_dir output --shape all-char
 ```
 # Modify config
 * Available characters, numbers, template in top of **synthesis_plate.py** file 
